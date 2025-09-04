@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Question Bank - Don Bosco College Autonomous Maram</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --warning-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            --glass-bg: rgba(255, 255, 255, 0.25);
+            --glass-border: rgba(255, 255, 255, 0.18);
+            --text-primary: #2d3436;
+            --text-secondary: #636e72;
+            --shadow-light: 0 8px 32px rgba(31, 38, 135, 0.37);
+            --shadow-heavy: 0 12px 40px rgba(31, 38, 135, 0.5);
+            --border-radius: 20px;
+            --border-radius-small: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.15) 0%, transparent 50%),
+                        radial-gradient(circle at 40% 40%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            33% { transform: translateY(-30px) rotate(0.5deg); }
+            66% { transform: translateY(20px) rotate(-0.5deg); }
+        }
+
+        .header {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            padding: 3rem 2rem;
+            text-align: center;
+            box-shadow: var(--shadow-light);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+            font-weight: 800;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            position: relative;
+            z-index: 2;
+        }
+
+        .header p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            position: relative;
+            z-index: 2;
+        }
+
+        .header .subtitle {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.1rem;
+            font-weight: 400;
+        }
+
+        .admin-toggle {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            background: var(--secondary-gradient);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 8px 30px rgba(241, 147, 251, 0.4);
+            z-index: 10;
+        }
+
+        .admin-toggle:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 12px 40px rgba(241, 147, 251, 0.6);
+        }
+
+        .admin-toggle:active {
+            transform: translateY(-1px) scale(1.02);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 3rem auto;
+            padding: 0 2rem;
+        }
+
+        .years-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2.5rem;
+            margin-top: 2rem;
+        }
+
+        .year-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius);
+            padding: 3rem 2rem;
+            box-shadow: var(--shadow-light);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .year-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .year-card:hover::before {
+            left: 100%;
+        }
+
+        .year-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: var(--shadow-heavy);
+        }
+
+        .year-card h2 {
+            color: white;
+            font-size: 2.2rem;
+            margin-bottom: 1rem;
+            text-align: center;
+            font-weight: 700;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .year-card p {
+            color: rgba(255, 255, 255, 0.8);
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 500;
+        }
+
+        .semester-view, .exam-view, .admin-panel {
+            display: none;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius);
+            padding: 3rem;
+            margin-top: 2rem;
+            box-shadow: var(--shadow-light);
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .back-btn {
+            background: var(--success-gradient);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(79, 172, 254, 0.3);
+        }
+
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(79, 172, 254, 0.4);
+        }
+
+        .semester-grid, .exam-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .semester-card, .exam-card {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 2.5rem 2rem;
+            border-radius: var(--border-radius);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 8px 30px rgba(102, 126, 234, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .semester-card::before, .exam-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            transition: transform 0.5s ease;
+            transform: scale(0);
+        }
+
+        .semester-card:hover::before, .exam-card:hover::before {
+            transform: scale(1);
+        }
+
+        .semester-card:hover, .exam-card:hover {
+            transform: translateY(-5px) scale(1.03);
+            box-shadow: 0 12px 40px rgba(102, 126, 234, 0.4);
+        }
+
+        .semester-card h3, .exam-card h3 {
+            font-size: 1.8rem;
+            margin-bottom: 0.8rem;
+            font-weight: 700;
+            position: relative;
+            z-index: 2;
+        }
+
+        .semester-card p, .exam-card p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 2;
+        }
+
+        .questions-container {
+            margin-top: 2rem;
+        }
+
+        .question-item {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius-small);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 6px 25px rgba(31, 38, 135, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .question-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 35px rgba(31, 38, 135, 0.3);
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .question-title {
+            color: white;
+            font-size: 1.3rem;
+            font-weight: 600;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .question-actions {
+            display: flex;
+            gap: 0.8rem;
+        }
+
+        .action-btn {
+            background: var(--warning-gradient);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 15px rgba(67, 233, 123, 0.3);
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(67, 233, 123, 0.4);
+        }
+
+        .download-btn {
+            background: var(--secondary-gradient);
+            box-shadow: 0 4px 15px rgba(241, 147, 251, 0.3);
+        }
+
+        .download-btn:hover {
+            box-shadow: 0 6px 20px rgba(241, 147, 251, 0.4);
+        }
+
+        .question-item img {
+            width: 100%;
+            height: auto;
+            border-radius: var(--border-radius-small);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .question-item img:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .question-meta {
+            margin-top: 1rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.95rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .admin-panel {
+            background: var(--glass-bg);
+        }
+
+        .admin-panel h2 {
+            background: var(--secondary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 3rem;
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 800;
+        }
+
+        .upload-form {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 2rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.8rem;
+            font-weight: 600;
+            color: white;
+            font-size: 1.1rem;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .form-group select, .form-group input {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: var(--border-radius-small);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            backdrop-filter: blur(10px);
+        }
+
+        .form-group select:focus, .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.4);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .form-group select option {
+            background: #2d3436;
+            color: white;
+        }
+
+        .form-group input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .upload-btn {
+            width: 100%;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            padding: 18px;
+            border-radius: var(--border-radius-small);
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 8px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .upload-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(102, 126, 234, 0.5);
+        }
+
+        .upload-btn:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .upload-progress {
+            margin-top: 1.5rem;
+            text-align: center;
+            color: #00f2fe;
+            font-weight: 700;
+            font-size: 1.1rem;
+            text-shadow: 0 2px 10px rgba(0, 242, 254, 0.5);
+        }
+
+        .no-questions {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.8);
+            font-style: italic;
+            padding: 4rem 2rem;
+            font-size: 1.3rem;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.95);
+            animation: fadeIn 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            max-width: 95%;
+            max-height: 95%;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+        }
+
+        .modal img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .close {
+            position: absolute;
+            top: 20px;
+            right: 35px;
+            color: #f1f1f1;
+            font-size: 50px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 1001;
+            transition: all 0.3s ease;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .close:hover {
+            color: #ff6b6b;
+            transform: scale(1.1);
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Icons */
+        .icon {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 2rem 1rem;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .admin-toggle {
+                position: static;
+                margin: 1rem auto;
+                display: block;
+                border-radius: 25px;
+                padding: 12px 25px;
+            }
+            
+            .years-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            
+            .container {
+                padding: 0 1rem;
+            }
+
+            .question-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .question-actions {
+                width: 100%;
+                justify-content: flex-start;
+            }
+
+            .semester-view, .exam-view, .admin-panel {
+                padding: 2rem 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .action-btn {
+                padding: 8px 15px;
+                font-size: 0.8rem;
+            }
+            
+            .question-actions {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Question Bank</h1>
+        <p>Don Bosco College Autonomous Maram</p>
+        <p class="subtitle">Bachelor of Computer Application</p>
+        <button class="admin-toggle" onclick="toggleAdmin()">
+            <svg class="icon" viewBox="0 0 24 24">
+                <path d="M12 15c1.66 0 2.99-1.34 2.99-3L15 6c0-1.66-1.34-3-3-3S9 4.34 9 6v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 15 6.7 12H5c0 3.41 2.72 6.23 6 6.72V22h2v-3.28c3.28-.49 6-3.31 6-6.72h-1.7z"/>
+            </svg>
+            Admin Panel
+        </button>
+    </div>
+
+    <div class="container">
+        <div id="main-view">
+            <div class="years-grid">
+                <div class="year-card" onclick="showYear(1)">
+                    <h2>1st Year</h2>
+                    <p>First Year Question Papers</p>
+                </div>
+                <div class="year-card" onclick="showYear(2)">
+                    <h2>2nd Year</h2>
+                    <p>Second Year Question Papers</p>
+                </div>
+                <div class="year-card" onclick="showYear(3)">
+                    <h2>3rd Year</h2>
+                    <p>Third Year Question Papers</p>
+                </div>
+                <div class="year-card" onclick="showYear(4)">
+                    <h2>4th Year</h2>
+                    <p>Fourth Year Question Papers</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="semester-view" class="semester-view">
+            <button class="back-btn" onclick="showMain()">← Back to Years</button>
+            <h2 id="semester-title"></h2>
+            <div class="semester-grid">
+                <div class="semester-card" onclick="showSemester(1)">
+                    <h3>Semester 1</h3>
+                    <p>First Semester</p>
+                </div>
+                <div class="semester-card" onclick="showSemester(2)">
+                    <h3>Semester 2</h3>
+                    <p>Second Semester</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="exam-view" class="exam-view">
+            <button class="back-btn" onclick="showYearView()">← Back to Semesters</button>
+            <h2 id="exam-title"></h2>
+            <div class="exam-grid">
+                <div class="exam-card" onclick="showExam('weekly')">
+                    <h3>Weekly Test</h3>
+                    <p>Weekly Test Papers</p>
+                </div>
+                <div class="exam-card" onclick="showExam('cia1')">
+                    <h3>CIA 1</h3>
+                    <p>First Internal Assessment</p>
+                </div>
+                <div class="exam-card" onclick="showExam('cia2')">
+                    <h3>CIA 2</h3>
+                    <p>Second Internal Assessment</p>
+                </div>
+                <div class="exam-card" onclick="showExam('endsem')">
+                    <h3>End Semester</h3>
+                    <p>End Semester Exam</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="questions-view" class="exam-view">
+            <button class="back-btn" onclick="showExamTypes()">← Back to Exam Types</button>
+            <h2 id="questions-title"></h2>
+            <div id="questions-container" class="questions-container"></div>
+        </div>
+
+        <div id="admin-panel" class="admin-panel">
+            <button class="back-btn" onclick="hideAdmin()">← Back to Main</button>
+            <h2>Admin Panel</h2>
+            <div class="upload-form">
+                <div class="form-group">
+                    <label for="year-select">Select Year:</label>
+                    <select id="year-select">
+                        <option value="1">1st Year</option>
+                        <option value="2">2nd Year</option>
+                        <option value="3">3rd Year</option>
+                        <option value="4">4th Year</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="semester-select">Select Semester:</label>
+                    <select id="semester-select">
+                        <option value="1">Semester 1</option>
+                        <option value="2">Semester 2</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="exam-select">Select Exam Type:</label>
+                    <select id="exam-select">
+                        <option value="weekly">Weekly Test</option>
+                        <option value="cia1">CIA 1</option>
+                        <option value="cia2">CIA 2</option>
+                        <option value="endsem">End Semester</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="question-name">Question Paper Name:</label>
+                    <input type="text" id="question-name" placeholder="Enter question paper name (e.g., 'Mathematics Mid-Term 2024')" />
+                </div>
+                <div class="form-group">
+                    <label for="file-input">Select Question Paper Image:</label>
+                    <input type="file" id="file-input" accept="image/*" multiple>
+                </div>
+                <button class="upload-btn" onclick="uploadQuestions()" id="upload-btn">Upload Questions</button>
+                <div id="upload-progress" class="upload-progress"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for image viewing -->
+    <div id="imageModal" class="modal" onclick="closeModal()">
+        <span class="close">&times;</span>
+        <div class="modal-content">
+            <img id="modalImage" src="" alt="Question Paper">
+        </div>
+    </div>
+
+    <script>
+        // State management
+        let currentState = {
+            view: 'main',
+            year: null,
+            semester: null,
+            examType: null
+        };
+
+        // In-memory storage for questions (simulating database)
+        let questionsDB = {};
+
+        // Initialize the app
+        function init() {
+            loadQuestionsFromStorage();
+            showMain();
+        }
+
+        // Navigation functions
+        function showMain() {
+            hideAllViews();
+            document.getElementById('main-view').style.display = 'block';
+            currentState.view = 'main';
+        }
+
+        function showYear(year) {
+            hideAllViews();
+            currentState.year = year;
+            document.getElementById('semester-title').textContent = `${getOrdinal(year)} Year Question Papers`;
+            document.getElementById('semester-title').style.color = 'white';
+            document.getElementById('semester-title').style.textAlign = 'center';
+            document.getElementById('semester-title').style.fontSize = '2.2rem';
+            document.getElementById('semester-title').style.fontWeight = '700';
+            document.getElementById('semester-title').style.marginBottom = '2rem';
+            document.getElementById('semester-title').style.textShadow = '0 2px 10px rgba(0, 0, 0, 0.3)';
+            document.getElementById('semester-view').style.display = 'block';
+            currentState.view = 'semester';
+        }
+
+        function showYearView() {
+            hideAllViews();
+            document.getElementById('semester-view').style.display = 'block';
+            currentState.view = 'semester';
+        }
+
+        function showSemester(semester) {
+            hideAllViews();
+            currentState.semester = semester;
+            const title = document.getElementById('exam-title');
+            title.textContent = `${getOrdinal(currentState.year)} Year - Semester ${semester}`;
+            title.style.color = 'white';
+            title.style.textAlign = 'center';
+            title.style.fontSize = '2.2rem';
+            title.style.fontWeight = '700';
+            title.style.marginBottom = '2rem';
+            title.style.textShadow = '0 2px 10px rgba(0, 0, 0, 0.3)';
+            document.getElementById('exam-view').style.display = 'block';
+            currentState.view = 'exam';
+        }
+
+        function showExamTypes() {
+            hideAllViews();
+            document.getElementById('exam-view').style.display = 'block';
+            currentState.view = 'exam';
+        }
+
+        function showExam(examType) {
+            hideAllViews();
+            currentState.examType = examType;
+            const examNames = {
+                'weekly': 'Weekly Test',
+                'cia1': 'CIA 1',
+                'cia2': 'CIA 2',
+                'endsem': 'End Semester Exam'
+            };
+            const title = document.getElementById('questions-title');
+            title.textContent = `${getOrdinal(currentState.year)} Year - Semester ${currentState.semester} - ${examNames[examType]}`;
+            title.style.color = 'white';
+            title.style.textAlign = 'center';
+            title.style.fontSize = '2.2rem';
+            title.style.fontWeight = '700';
+            title.style.marginBottom = '2rem';
+            title.style.textShadow = '0 2px 10px rgba(0, 0, 0, 0.3)';
+            document.getElementById('questions-view').style.display = 'block';
+            currentState.view = 'questions';
+            loadQuestions();
+        }
+
+        function hideAllViews() {
+            document.getElementById('main-view').style.display = 'none';
+            document.getElementById('semester-view').style.display = 'none';
+            document.getElementById('exam-view').style.display = 'none';
+            document.getElementById('questions-view').style.display = 'none';
+            document.getElementById('admin-panel').style.display = 'none';
+        }
+
+        function toggleAdmin() {
+            hideAllViews();
+            document.getElementById('admin-panel').style.display = 'block';
+            currentState.view = 'admin';
+        }
+
+        function hideAdmin() {
+            hideAllViews();
+            showMain();
+        }
+
+        // Utility functions
+        function getOrdinal(num) {
+            const ordinals = ['', '1st', '2nd', '3rd', '4th'];
+            return ordinals[num];
+        }
+
+        function getQuestionKey(year, semester, examType) {
+            return `${year}_${semester}_${examType}`;
+        }
+
+        // Question management
+        function loadQuestions() {
+            const key = getQuestionKey(currentState.year, currentState.semester, currentState.examType);
+            const questions = questionsDB[key] || [];
+            const container = document.getElementById('questions-container');
+            
+            if (questions.length === 0) {
+                container.innerHTML = '<div class="no-questions">📄 No question papers available for this section.<br>Contact admin to upload question papers.</div>';
+                return;
+            }
+
+            container.innerHTML = questions.map((question, index) => `
+                <div class="question-item">
+                    <div class="question-header">
+                        <h3 class="question-title">${question.name || `Question Paper ${index + 1}`}</h3>
+                        <div class="question-actions">
+                            <button class="action-btn" onclick="openModal('${question.url}')">
+                                <svg class="icon" viewBox="0 0 24 24">
+                                    <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                                </svg>
+                                View
+                            </button>
+                            <button class="action-btn download-btn" onclick="downloadImage('${question.url}', '${question.name || `Question_Paper_${index + 1}`}')">
+                                <svg class="icon" viewBox="0 0 24 24">
+                                    <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                                </svg>
+                                Download
+                            </button>
+                        </div>
+                    </div>
+                    <img src="${question.url}" alt="${question.name || `Question Paper ${index + 1}`}" onclick="openModal('${question.url}')">
+                    <div class="question-meta">
+                        <span>📅 Uploaded: ${question.uploadDate}</span>
+                        <span>📁 ${question.fileName}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function saveQuestionsToStorage() {
+            try {
+                localStorage.setItem('questionBank', JSON.stringify(questionsDB));
+            } catch (e) {
+                // Handle storage quota exceeded or other errors
+            }
+        }
+
+        function loadQuestionsFromStorage() {
+            try {
+                const stored = localStorage.getItem('questionBank');
+                if (stored) {
+                    questionsDB = JSON.parse(stored);
+                }
+            } catch (e) {
+                questionsDB = {};
+            }
+        }
+
+        // Download functionality
+        async function downloadImage(url, filename) {
+            try {
+                const button = event.target.closest('.download-btn');
+                const originalText = button.innerHTML;
+                
+                button.innerHTML = '<div class="loading"></div> Downloading...';
+                button.disabled = true;
+                
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Download failed');
+                
+                const blob = await response.blob();
+                const downloadUrl = window.URL.createObjectURL(blob);
+                
+                const link = document.createElement('a');
+                link.href = downloadUrl;
+                link.download = `${filename}.jpg`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                window.URL.revokeObjectURL(downloadUrl);
+                
+                button.innerHTML = originalText;
+                button.disabled = false;
+                
+                // Show success message briefly
+                button.innerHTML = `
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/>
+                    </svg>
+                    Downloaded
+                `;
+                
+                setTimeout(() => {
+                    button.innerHTML = originalText;
+                }, 2000);
+                
+            } catch (error) {
+                const button = event.target.closest('.download-btn');
+                button.innerHTML = `
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                    </svg>
+                    Failed
+                `;
+                button.disabled = false;
+                
+                setTimeout(() => {
+                    button.innerHTML = `
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                        </svg>
+                        Download
+                    `;
+                }, 3000);
+            }
+        }
+
+        // Image upload to Cloudinary
+        async function uploadToCloudinary(file) {
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('upload_preset', 'qbank22');
+            formData.append('cloud_name', 'digu6ret2');
+
+            try {
+                const response = await fetch('https://api.cloudinary.com/v1_1/digu6ret2/image/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error('Upload failed');
+                }
+
+                const data = await response.json();
+                return data.secure_url;
+            } catch (error) {
+                throw new Error('Failed to upload to Cloudinary: ' + error.message);
+            }
+        }
+
+        // Admin functions
+        async function uploadQuestions() {
+            const yearSelect = document.getElementById('year-select');
+            const semesterSelect = document.getElementById('semester-select');
+            const examSelect = document.getElementById('exam-select');
+            const questionNameInput = document.getElementById('question-name');
+            const fileInput = document.getElementById('file-input');
+            const uploadBtn = document.getElementById('upload-btn');
+            const progressDiv = document.getElementById('upload-progress');
+
+            if (!fileInput.files.length) {
+                alert('Please select at least one image file.');
+                return;
+            }
+
+            if (!questionNameInput.value.trim()) {
+                alert('Please enter a name for the question paper.');
+                questionNameInput.focus();
+                return;
+            }
+
+            const year = yearSelect.value;
+            const semester = semesterSelect.value;
+            const examType = examSelect.value;
+            const questionName = questionNameInput.value.trim();
+            const files = Array.from(fileInput.files);
+
+            uploadBtn.disabled = true;
+            uploadBtn.innerHTML = '<div class="loading"></div> Uploading...';
+            progressDiv.textContent = '';
+
+            try {
+                const key = getQuestionKey(year, semester, examType);
+                if (!questionsDB[key]) {
+                    questionsDB[key] = [];
+                }
+
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    const fileName = files.length > 1 ? `${questionName} - Part ${i + 1}` : questionName;
+                    progressDiv.innerHTML = `
+                        <div class="loading"></div>
+                        Uploading "${fileName}" (${i + 1} of ${files.length})...
+                    `;
+                    
+                    const url = await uploadToCloudinary(file);
+                    
+                    questionsDB[key].push({
+                        url: url,
+                        name: fileName,
+                        uploadDate: new Date().toLocaleDateString('en-IN', {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric'
+                        }),
+                        fileName: file.name
+                    });
+                }
+
+                saveQuestionsToStorage();
+                progressDiv.innerHTML = `
+                    <svg class="icon" style="color: #00f2fe; margin-right: 0.5rem;" viewBox="0 0 24 24">
+                        <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/>
+                    </svg>
+                    Upload completed successfully!
+                `;
+                
+                // Reset form
+                fileInput.value = '';
+                questionNameInput.value = '';
+                
+                setTimeout(() => {
+                    progressDiv.textContent = '';
+                }, 5000);
+
+            } catch (error) {
+                progressDiv.innerHTML = `
+                    <svg class="icon" style="color: #ff6b6b; margin-right: 0.5rem;" viewBox="0 0 24 24">
+                        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                    </svg>
+                    Upload failed: ${error.message}
+                `;
+                progressDiv.style.color = '#ff6b6b';
+                
+                setTimeout(() => {
+                    progressDiv.textContent = '';
+                    progressDiv.style.color = '#00f2fe';
+                }, 8000);
+            } finally {
+                uploadBtn.disabled = false;
+                uploadBtn.innerHTML = `
+                    <svg class="icon" style="margin-right: 0.5rem;" viewBox="0 0 24 24">
+                        <path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/>
+                    </svg>
+                    Upload Questions
+                `;
+            }
+        }
+
+        // Modal functions
+        function openModal(imageSrc) {
+            const modal = document.getElementById('imageModal');
+            const modalImg = document.getElementById('modalImage');
+            modal.style.display = 'block';
+            modalImg.src = imageSrc;
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('imageModal');
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // Event listeners
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeModal();
+            }
+        });
+
+        // Prevent modal from closing when clicking on image
+        document.getElementById('modalImage').addEventListener('click', function(event) {
+            event.stopPropagation();
+        });
+
+        // Initialize the app when page loads
+        window.onload = init;
+    </script>
+</body>
+</html>
