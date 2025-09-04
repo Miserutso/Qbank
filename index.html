@@ -753,7 +753,32 @@
         </div>
     </div>
 
+    <!-- Firebase SDK -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-app-compat.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-firestore-compat.min.js"></script>
+
     <script>
+        // Firebase Configuration - Replace with your Firebase config
+        const firebaseConfig = {
+            apiKey: "AIzaSyCSu3oUZ9IsiY7YW8rU7HBgDq70uC31QCM",
+            authDomain: "owowo-9c937.firebaseapp.com", 
+            projectId: "owowo-9c937",
+            storageBucket: "owowo-9c937.firebasestorage.app",
+            messagingSenderId: "326806553855",
+            appId: "1:326806553855:web:bd7c89eaa743643460f8ca",
+        };
+
+        // Initialize Firebase
+        let db;
+        try {
+            firebase.initializeApp(firebaseConfig);
+            db = firebase.firestore();
+            console.log('Firebase initialized successfully');
+        } catch (error) {
+            console.warn('Firebase not configured. Using localStorage fallback.');
+            db = null;
+        }
+
         // State management
         let currentState = {
             view: 'main',
@@ -762,7 +787,7 @@
             examType: null
         };
 
-        // In-memory storage for questions (simulating database)
+        // In-memory storage for questions (fallback)
         let questionsDB = {};
 
         // Initialize the app
@@ -870,50 +895,125 @@
             return `${year}_${semester}_${examType}`;
         }
 
-        // Question management
-        function loadQuestions() {
-            const key = getQuestionKey(currentState.year, currentState.semester, currentState.examType);
-            const questions = questionsDB[key] || [];
-            const container = document.getElementById('questions-container');
-            
-            if (questions.length === 0) {
-                container.innerHTML = '<div class="no-questions">📄 No question papers available for this section.<br>Contact admin to upload question papers.</div>';
-                return;
+        // Firebase functions
+        async function saveQuestionToFirebase(year, semester, examType, questionData) {
+            if (!db) {
+                throw new Error('Firebase not configured');
             }
 
-            container.innerHTML = questions.map((question, index) => `
-                <div class="question-item">
-                    <div class="question-header">
-                        <h3 class="question-title">${question.name || `Question Paper ${index + 1}`}</h3>
-                        <div class="question-actions">
-                            <button class="action-btn" onclick="openModal('${question.url}')">
-                                <svg class="icon" viewBox="0 0 24 24">
-                                    <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
-                                </svg>
-                                View
-                            </button>
-                            <button class="action-btn download-btn" onclick="downloadImage('${question.url}', '${question.name || `Question_Paper_${index + 1}`}')">
-                                <svg class="icon" viewBox="0 0 24 24">
-                                    <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
-                                </svg>
-                                Download
-                            </button>
+            try {
+                await db.collection('questions').add({
+                    year: parseInt(year),
+                    semester: parseInt(semester),
+                    examType: examType,
+                    name: questionData.name,
+                    url: questionData.url,
+                    uploadDate: questionData.uploadDate,
+                    fileName: questionData.fileName,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            } catch (error) {
+                console.error('Error saving to Firebase:', error);
+                throw error;
+            }
+        }
+
+        async function loadQuestionsFromFirebase(year, semester, examType) {
+            if (!db) {
+                return [];
+            }
+
+            try {
+                const snapshot = await db.collection('questions')
+                    .where('year', '==', parseInt(year))
+                    .where('semester', '==', parseInt(semester))
+                    .where('examType', '==', examType)
+                    .orderBy('timestamp', 'desc')
+                    .get();
+                
+                const questions = [];
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    questions.push({
+                        id: doc.id,
+                        name: data.name,
+                        url: data.url,
+                        uploadDate: data.uploadDate,
+                        fileName: data.fileName
+                    });
+                });
+                
+                return questions;
+            } catch (error) {
+                console.error('Error loading from Firebase:', error);
+                return [];
+            }
+        }
+
+        // Question management
+        async function loadQuestions() {
+            const container = document.getElementById('questions-container');
+            container.innerHTML = '<div style="text-align: center; color: white; padding: 2rem;"><div class="loading"></div> Loading questions...</div>';
+
+            try {
+                let questions;
+                
+                if (db) {
+                    // Load from Firebase
+                    questions = await loadQuestionsFromFirebase(
+                        currentState.year, 
+                        currentState.semester, 
+                        currentState.examType
+                    );
+                } else {
+                    // Fallback to localStorage
+                    const key = getQuestionKey(currentState.year, currentState.semester, currentState.examType);
+                    questions = questionsDB[key] || [];
+                }
+                
+                if (questions.length === 0) {
+                    container.innerHTML = '<div class="no-questions">No question papers available for this section.<br>Contact admin to upload question papers.</div>';
+                    return;
+                }
+
+                container.innerHTML = questions.map((question, index) => `
+                    <div class="question-item">
+                        <div class="question-header">
+                            <h3 class="question-title">${question.name || `Question Paper ${index + 1}`}</h3>
+                            <div class="question-actions">
+                                <button class="action-btn" onclick="openModal('${question.url}')">
+                                    <svg class="icon" viewBox="0 0 24 24">
+                                        <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                                    </svg>
+                                    View
+                                </button>
+                                <button class="action-btn download-btn" onclick="downloadImage('${question.url}', '${question.name || `Question_Paper_${index + 1}`}')">
+                                    <svg class="icon" viewBox="0 0 24 24">
+                                        <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                                    </svg>
+                                    Download
+                                </button>
+                            </div>
+                        </div>
+                        <img src="${question.url}" alt="${question.name || `Question Paper ${index + 1}`}" onclick="openModal('${question.url}')">
+                        <div class="question-meta">
+                            <span>Uploaded: ${question.uploadDate}</span>
+                            <span>${question.fileName}</span>
                         </div>
                     </div>
-                    <img src="${question.url}" alt="${question.name || `Question Paper ${index + 1}`}" onclick="openModal('${question.url}')">
-                    <div class="question-meta">
-                        <span>📅 Uploaded: ${question.uploadDate}</span>
-                        <span>📁 ${question.fileName}</span>
-                    </div>
-                </div>
-            `).join('');
+                `).join('');
+
+            } catch (error) {
+                console.error('Error loading questions:', error);
+                container.innerHTML = '<div class="no-questions">Error loading questions. Please try again later.</div>';
+            }
         }
 
         function saveQuestionsToStorage() {
             try {
                 localStorage.setItem('questionBank', JSON.stringify(questionsDB));
             } catch (e) {
-                // Handle storage quota exceeded or other errors
+                console.warn('localStorage not available');
             }
         }
 
@@ -1044,11 +1144,6 @@
             progressDiv.textContent = '';
 
             try {
-                const key = getQuestionKey(year, semester, examType);
-                if (!questionsDB[key]) {
-                    questionsDB[key] = [];
-                }
-
                 for (let i = 0; i < files.length; i++) {
                     const file = files[i];
                     const fileName = files.length > 1 ? `${questionName} - Part ${i + 1}` : questionName;
@@ -1057,9 +1152,11 @@
                         Uploading "${fileName}" (${i + 1} of ${files.length})...
                     `;
                     
+                    // Upload to Cloudinary
                     const url = await uploadToCloudinary(file);
                     
-                    questionsDB[key].push({
+                    // Create question data
+                    const questionData = {
                         url: url,
                         name: fileName,
                         uploadDate: new Date().toLocaleDateString('en-IN', {
@@ -1068,10 +1165,22 @@
                             day: 'numeric'
                         }),
                         fileName: file.name
-                    });
+                    };
+                    
+                    // Save to Firebase (primary) or localStorage (fallback)
+                    if (db) {
+                        await saveQuestionToFirebase(year, semester, examType, questionData);
+                    } else {
+                        // Fallback to localStorage
+                        const key = getQuestionKey(year, semester, examType);
+                        if (!questionsDB[key]) {
+                            questionsDB[key] = [];
+                        }
+                        questionsDB[key].push(questionData);
+                        saveQuestionsToStorage();
+                    }
                 }
 
-                saveQuestionsToStorage();
                 progressDiv.innerHTML = `
                     <svg class="icon" style="color: #00f2fe; margin-right: 0.5rem;" viewBox="0 0 24 24">
                         <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/>
@@ -1088,6 +1197,7 @@
                 }, 5000);
 
             } catch (error) {
+                console.error('Upload error:', error);
                 progressDiv.innerHTML = `
                     <svg class="icon" style="color: #ff6b6b; margin-right: 0.5rem;" viewBox="0 0 24 24">
                         <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
@@ -1102,12 +1212,7 @@
                 }, 8000);
             } finally {
                 uploadBtn.disabled = false;
-                uploadBtn.innerHTML = `
-                    <svg class="icon" style="margin-right: 0.5rem;" viewBox="0 0 24 24">
-                        <path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/>
-                    </svg>
-                    Upload Questions
-                `;
+                uploadBtn.innerHTML = `Upload Questions`;
             }
         }
 
@@ -1143,3 +1248,4 @@
     </script>
 </body>
 </html>
+                
